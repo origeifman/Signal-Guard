@@ -178,3 +178,12 @@ class BrokerAdapter(ABC):
 
     @abstractmethod
     def stream_fills(self) -> AsyncIterator[Fill]: ...
+
+    async def aclose(self) -> None:
+        """Release any held resources (e.g. an HTTP client).
+
+        Concrete on purpose: an adapter with nothing to release (like the test
+        fake) inherits a harmless no-op, so callers can always close what they
+        built without special-casing the implementation.
+        """
+        return None

@@ -9,7 +9,12 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from signalguard import __version__
+from signalguard.api.auth import router as auth_router
+from signalguard.api.broker_accounts import router as broker_accounts_router
+from signalguard.api.dashboard import router as dashboard_router
 from signalguard.api.health import router as health_router
+from signalguard.api.killswitch import router as killswitch_router
+from signalguard.api.risk_profile import router as risk_profile_router
 from signalguard.config import Settings, get_settings
 from signalguard.db.session import dispose_engine, init_engine
 from signalguard.ingress.routes import router as webhook_router
@@ -87,6 +92,11 @@ def create_app() -> FastAPI:
 
     app.include_router(health_router)
     app.include_router(webhook_router)
+    app.include_router(auth_router)
+    app.include_router(risk_profile_router)
+    app.include_router(broker_accounts_router)
+    app.include_router(dashboard_router)
+    app.include_router(killswitch_router)
     return app
 
 

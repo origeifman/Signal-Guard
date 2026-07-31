@@ -319,7 +319,10 @@ Billing / subscription tiers / quotas · multiple brokers (design the interface,
 | **5 — Dashboard** | Next.js frontend, WebSocket feed, all four pages, kill switch | Kill switch flattens testnet |
 | **6 — Ops** | Telegram notifications, deploy docs, 3am runbook | `docs/runbook.md` |
 
-**Current phase: 1 — Skeleton delivered, awaiting sign-off. Phase 2 not started.**
+**Current phase: 5 — Dashboard. Phases 1–4 delivered (code committed, `IN REVIEW`
+pending human sign-off). The Phase 5 backend REST API + session auth is delivered
+(`IN REVIEW`); the WebSocket feed and Next.js frontend are still open. See
+`PROJECT_MANAGEMENT.md` for the authoritative per-task state.**
 
 ---
 

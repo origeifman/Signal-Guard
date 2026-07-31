@@ -90,7 +90,19 @@ Surfaced while working through the spec. Flagged, not guessed — see plan §4.
 ## Task board
 
 Seeded from the phases in `CLAUDE.md` §14. Add rows as work is broken down further; give
-each a unique ID. **Current phase: 1 — Skeleton (delivered, awaiting human sign-off).**
+each a unique ID. **Current phase: 5 — Dashboard (backend REST API delivered, awaiting human
+sign-off; WebSocket + frontend still open).**
+
+> **Board reconciliation (2026-07-31).** The board had drifted badly out of sync with the
+> code: Phases 2, 3 and 4 are all **committed** (`bc7bad1` risk engine, `0946bb6` ingress,
+> `595224f` execution) with 244 tests passing, yet Phase 3/4 rows still read `BACKLOG /
+> _unclaimed_`. Those rows are corrected to `IN REVIEW` below to match reality — this is a
+> documentation fix, not a claim of authorship. `CLAUDE.md` §14's "Current phase" footer was
+> updated in the same commit.
+>
+> **Branch note.** This session runs under a mandate to commit to branch
+> `claude/book-complete-tasks-8lv6po`, not `main` as `CLAUDE.md` §4 describes. Board updates
+> here therefore won't be visible to agents working on `main` until the branch is merged.
 
 > **Note on the open questions.** The human replied "can you program it" without answering Q1–Q5 or
 > OQ-1…OQ-6. Those answers are therefore recorded as **adopted by default** — the agent's own
@@ -127,27 +139,27 @@ each a unique ID. **Current phase: 1 — Skeleton (delivered, awaiting human sig
 
 | ID | Task | Layer | Owner | Status | Depends on | Notes |
 |---|---|---|---|---|---|---|
-| P3-1 | `POST /webhook/{endpoint_id}`: HMAC auth, timestamp replay guard, body-secret fallback | ingress | _unclaimed_ | BACKLOG | P1-2 | Reject oversized bodies before parsing. |
-| P3-2 | Strict schema validation + dedupe key (§8) + Redis rate limit | ingress | _unclaimed_ | BACKLOG | P3-1 | Same alert twice → 1 decision. |
-| P3-3 | Persist alert + decision (append-only), run risk in background task | ingress/db | _unclaimed_ | BACKLOG | P2-1, P3-2 | Respond 200 in < 50 ms. |
-| P3-4 | `POST /webhook/{endpoint_id}/test` — full pipeline, no broker | ingress | _unclaimed_ | BACKLOG | P3-3 | First-class, not a debug hook. |
+| P3-1 | `POST /webhook/{endpoint_id}`: HMAC auth, timestamp replay guard, body-secret fallback | ingress | claude-opus-5 (phase-3) | IN REVIEW | P1-2 | Reject oversized bodies before parsing. **Reconciled: code committed in `0946bb6`.** |
+| P3-2 | Strict schema validation + dedupe key (§8) + Redis rate limit | ingress | claude-opus-5 (phase-3) | IN REVIEW | P3-1 | Same alert twice → 1 decision. **Reconciled: committed in `0946bb6`.** |
+| P3-3 | Persist alert + decision (append-only), run risk in background task | ingress/db | claude-opus-5 (phase-3) | IN REVIEW | P2-1, P3-2 | Respond 200 in < 50 ms. **Reconciled: committed in `0946bb6`.** |
+| P3-4 | `POST /webhook/{endpoint_id}/test` — full pipeline, no broker | ingress | claude-opus-5 (phase-3) | IN REVIEW | P3-3 | First-class, not a debug hook. **Reconciled: committed in `0946bb6`.** |
 
 ### Phase 4 — Execution
 
 | ID | Task | Layer | Owner | Status | Depends on | Notes |
 |---|---|---|---|---|---|---|
-| P4-1 | Broker abstract base + Binance testnet adapter (§9) | execution | _unclaimed_ | BACKLOG | P3-3 | Map broker errors to internal enum. |
-| P4-2 | Order submission + protective stop (atomic/bracket, else close-and-alert) | execution | _unclaimed_ | BACKLOG | P4-1 | Never leave a naked position. |
-| P4-3 | Reconciliation loop + fills → trades → PnL | execution | _unclaimed_ | BACKLOG | P4-1 | Broker is the source of truth. |
-| P4-4 | Kill switch: cancel → close all → LOCKED → notify (idempotent endpoint) | execution | _unclaimed_ | BACKLOG | P4-1 | Must work even if risk/WS is down. |
+| P4-1 | Broker abstract base + Binance testnet adapter (§9) | execution | claude-opus-5 (phase-4) | IN REVIEW | P3-3 | Map broker errors to internal enum. **Reconciled: committed in `595224f`.** |
+| P4-2 | Order submission + protective stop (atomic/bracket, else close-and-alert) | execution | claude-opus-5 (phase-4) | IN REVIEW | P4-1 | Never leave a naked position. **Reconciled: committed in `595224f`.** |
+| P4-3 | Reconciliation loop + fills → trades → PnL | execution | claude-opus-5 (phase-4) | IN REVIEW | P4-1 | Broker is the source of truth. **Reconciled: committed in `595224f`.** |
+| P4-4 | Kill switch: cancel → close all → LOCKED → notify (idempotent endpoint) | execution | claude-opus-5 (phase-4) | IN REVIEW | P4-1 | Must work even if risk/WS is down. **Reconciled: committed in `595224f`.** The HTTP kill-switch endpoint is added in P5-1. |
 
 ### Phase 5 — Dashboard
 
 | ID | Task | Layer | Owner | Status | Depends on | Notes |
 |---|---|---|---|---|---|---|
-| P5-1 | REST API: profiles, broker accounts, decisions, orders, positions, equity, kill switch | api | _unclaimed_ | BACKLOG | P4-x | Decisions filterable by reason code. |
-| P5-2 | WebSocket `/ws` fed by Redis pub/sub | api | _unclaimed_ | BACKLOG | P5-1 | Decisions, orders, positions, equity. |
-| P5-3 | Next.js frontend — Live, Risk profile, History, Setup pages | frontend | _unclaimed_ | BACKLOG | P5-1, P5-2 | Kill-switch button with confirm step. |
+| P5-1 | REST API: profiles, broker accounts, decisions, orders, positions, equity, kill switch | api | claude (phase-5) | IN REVIEW | P4-x | Delivered in `backend/src/signalguard/api/{auth,deps,schemas,risk_profile,broker_accounts,dashboard,killswitch}.py` + `execution/{credentials,factory}.py`. Session auth (register/login/logout/me, fail-closed `current_user`), risk-profile get/update/**sizing preview** (reuses the pure engine), broker-account list/create/delete (creds AES-GCM sealed, never returned; soft delete), decisions (filterable by reason code) / orders / positions / equity feeds (per-user scoped), idempotent kill switch (locks even if the adapter can't be built). 16 new pure tests + 17 integration tests. `ruff` + `mypy --strict` clean; 260 pure tests green. **Not run against a live stack** (no Postgres/Redis in the build session) — human must run `docker compose exec api uv run pytest tests/api`. **Not included:** WebSocket (P5-2), frontend (P5-3); the dashboard "test signal" button reuses the existing `POST /webhook/{id}/test`. |
+| P5-2 | WebSocket `/ws` fed by Redis pub/sub | api | _unclaimed_ | TODO | P5-1 | Decisions, orders, positions, equity. Ready to claim — P5-1's read models (`api/schemas.py`) are the payload shapes to push. |
+| P5-3 | Next.js frontend — Live, Risk profile, History, Setup pages | frontend | _unclaimed_ | BACKLOG | P5-1, P5-2 | Kill-switch button with confirm step. Consumes the P5-1 REST API. |
 
 ### Phase 6 — Ops
 
@@ -197,3 +209,5 @@ Append a line whenever a task changes status, so the history of who-did-what is 
 | 2026-07-31 | OPS-5, OPS-6 | Added and pre-booked → `RESERVED` (dependabot config; uv CI cache). Dropped a ruff-format gate idea: `ruff format --check` would reformat 43/67 files — out of lane. | claude-opus-5 (ops) |
 | 2026-07-31 | OPS-5 | `.github/dependabot.yml` added (weekly grouped pip + github-actions updates). → `DONE`. | claude-opus-5 (ops) |
 | 2026-07-31 | OPS-6 | uv dependency caching enabled on both CI jobs (keyed on `backend/uv.lock`). → `DONE`. | claude-opus-5 (ops) |
+| 2026-07-31 | P3-1…P3-4, P4-1…P4-4 | **Board reconciled** to match committed code (`0946bb6`, `595224f`): `BACKLOG/_unclaimed_` → `IN REVIEW`. Documentation fix, not new work. | claude (phase-5) |
+| 2026-07-31 | P5-1 | Claimed and delivered on branch `claude/book-complete-tasks-8lv6po`: dashboard REST API + session auth (7 routers, 17 endpoints). 16 pure + 17 integration tests; ruff + mypy `--strict` clean; 260 pure tests green. Not yet run against a live stack. → `IN REVIEW`. | claude (phase-5) |
