@@ -2,6 +2,14 @@
 
 Guidance for Claude Code working in this repository. Read this before writing anything.
 
+> **Re-read this file at the start of every message.** Before you act on any new
+> instruction — every single message, not just the first of a session — open
+> `CLAUDE.md` and read it again. It may have changed since your last turn (another
+> agent edits it, the human updates a rule), and stale assumptions about the rules
+> are exactly the kind of error this project cannot afford. Treat the freshly-read
+> `CLAUDE.md` as authoritative over anything you remember from earlier in the
+> conversation.
+
 > **Multiple agents work in this repo. Before you start any task, open [`PROJECT_MANAGEMENT.md`](./PROJECT_MANAGEMENT.md).** It is the shared task board — the "Jira" for the agents on this project. Read it to see what everyone is working on, claim the task you're about to do so no one else picks it up, and update it as you go. Coordinating through that board is not optional; two agents silently editing the same file is exactly the kind of collision it exists to prevent. See §2 for the exact protocol.
 
 ---
