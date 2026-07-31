@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=\"${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || echo .)}/CLAUDE.md\"; if [ -f \"$f\" ]; then printf \"### CLAUDE.md — project rules, re-injected on every message. Treat this freshly-read copy as authoritative over anything remembered earlier.\\n\\n\"; cat \"$f\"; fi",
+            "timeout": 10,
+            "statusMessage": "Re-reading CLAUDE.md"
+          }
+        ]
+      }
+    ]
+  }
+}
